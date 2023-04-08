@@ -43,7 +43,6 @@ public class AppDbContext : DbContext
         builder.Entity<Mechanic>().Property(p => p.Description).IsRequired().HasMaxLength(300);
         builder.Entity<Mechanic>().Property(p => p.Phone).IsRequired();
         builder.Entity<Mechanic>().Property(p => p.Address).IsRequired().HasMaxLength(200);
-        builder.Entity<Mechanic>().Property(p => p.UserId).IsRequired();
 
         //Relationships
         builder.Entity<Mechanic>().HasMany(p => p.Appointments)
