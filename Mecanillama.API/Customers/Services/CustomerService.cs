@@ -1,25 +1,42 @@
-﻿using Mecanillama.API.Customers.Domain.Model;
+﻿using AutoMapper;
+using Mecanillama.API.Customers.Domain.Model;
 using Mecanillama.API.Customers.Domain.Repositories;
 using Mecanillama.API.Customers.Domain.Services;
 using Mecanillama.API.Customers.Domain.Services.Communication;
+using Mecanillama.API.Security.Authorization.Handlers.Interfaces;
+using Mecanillama.API.Security.Domain.Services.Communication;
+using Mecanillama.API.Security.Exceptions;
 using Mecanillama.API.Shared.Domain.Repositories;
+using BCryptNet = BCrypt.Net.BCrypt;
 
 namespace Mecanillama.API.Customers.Services;
 
-public class CustomerService : ICustomerService {
+public class CustomerService : ICustomerService
+{
     private readonly ICustomerRepository _customerRepository;
     private readonly IUnitOfWork _unitOfWork;
-
-    public CustomerService(ICustomerRepository customerRepository, IUnitOfWork unitOfWork) {
+    private readonly IJwtHandler _jwtHandler;
+    private readonly IMapper _mapper;
+    public CustomerService(ICustomerRepository customerRepository, IUnitOfWork unitOfWork, IJwtHandler jwtHandler, IMapper mapper)
+    {
         _customerRepository = customerRepository;
         _unitOfWork = unitOfWork;
+        _jwtHandler = jwtHandler;
+        _mapper = mapper;
     }
 
     public async Task<IEnumerable<Customer>> ListAsync()
     {
         return await _customerRepository.ListAsync();
     }
-    public async Task<CustomerResponse> GetByIdAsync(long id)
+    public async Task<Customer> GetByIdAsync(int id)
+    {
+        var customer = await _customerRepository.FindByIdAsync(id);
+        if (customer == null) throw new KeyNotFoundException("Customer not found.");
+        return customer;
+    }
+
+    public async Task<CustomerResponse> FindById(int id)
     {
         var existingCustomer = await _customerRepository.FindByIdAsync(id);
 
@@ -29,68 +46,73 @@ public class CustomerService : ICustomerService {
         return new CustomerResponse(existingCustomer);
     }
 
-    public async Task<CustomerResponse> GetByUserIdAsync(long userId)
+    public async Task RegisterAsync(RegisterCustomerRequest request)
     {
-        var existingCustomer = await _customerRepository.FindByUserIdAsync(userId);
+        //Validate
+        if (_customerRepository.ExistsByEmail(request.Email))
+            throw new AppException($"Email {request.Email} is already taken.");
 
-        if (existingCustomer == null)
-            return new CustomerResponse("Customer not found.");
+        //Map request to customer
+        var customer = _mapper.Map<Customer>(request);
 
-        return new CustomerResponse(existingCustomer);
-    } 
+        //Hash Password
+        customer.PasswordHash = BCryptNet.HashPassword(request.Password);
 
-    public async Task<CustomerResponse> SaveAsync(Customer customer) {
         try
         {
             await _customerRepository.AddAsync(customer);
             await _unitOfWork.CompleteAsync();
-            return new CustomerResponse(customer);
         }
         catch (Exception e)
         {
-            return new CustomerResponse($"An error occurred while saving the customer: {e.Message}");
+            throw new AppException($"An error occurred while saving the customer: {e.Message}");
         }
     }
 
-    public async Task<CustomerResponse> UpdateAsync(long id, Customer customer)
+    public async Task UpdateAsync(int id, UpdateCustomerRequest request)
     {
-        var existingCustomer = await _customerRepository.FindByIdAsync(id);
-        if (existingCustomer == null)
-        {
-            return new CustomerResponse("Customer not found ");
-        }
+        var customer = GetById(id);
 
-        existingCustomer.Name = customer.Name;
+        //Validate
+        if (_customerRepository.ExistsByEmail(request.Email))
+            throw new AppException($"Email {request.Email} is already taken.");
+
+        //Hash Password if entered
+        if (!string.IsNullOrEmpty(request.Password))
+            customer.PasswordHash = BCryptNet.HashPassword(request.Password);
+
+        //Map request to Customer
+        _mapper.Map(request, customer);
 
         try
         {
-            _customerRepository.Update(existingCustomer);
+            _customerRepository.Update(customer);
             await _unitOfWork.CompleteAsync();
-
-            return new CustomerResponse(existingCustomer);
         }
         catch (Exception e)
         {
-            return new CustomerResponse($"An error occurred while updating the customer: {e.Message}");
+            throw new AppException($"An error occurred while updating the customer: {e.Message}");
+        }
+    }
+    public async Task DeleteAsync(int id)
+    {
+        var customer = GetById(id);
+
+        try
+        {
+            _customerRepository.Remove(customer);
+            await _unitOfWork.CompleteAsync();
+        }
+        catch (Exception e)
+        {
+            throw new AppException($"An error occurred while deleting the customer: {e.Message}");
         }
     }
 
-    public async Task<CustomerResponse> DeleteAsync(long id) {
-        var existingCustomer = await _customerRepository.FindByIdAsync(id);
-
-        if (existingCustomer == null)
-            return new CustomerResponse("Customer not found.");
-
-        try
-        {
-            _customerRepository.Remove(existingCustomer);
-            await _unitOfWork.CompleteAsync();
-
-            return new CustomerResponse(existingCustomer);
-        }
-        catch (Exception e)
-        {
-            return new CustomerResponse($"An error occurred while deleting the customer: {e.Message}");
-        }
+    private Customer GetById(int id)
+    {
+        var customer = _customerRepository.FindById(id);
+        if (customer == null) throw new KeyNotFoundException("Customer not found.");
+        return customer;
     }
 }

@@ -7,7 +7,7 @@ namespace Mecanillama.API.Customers.Domain.Services;
 public interface ICustomerService
 {
     Task<IEnumerable<Customer>> ListAsync();
-    Task<Customer> GetByIdAsync(long id);
+    Task<Customer> GetByIdAsync(int id);
     Task<CustomerResponse> FindById(int id);
     Task RegisterAsync(RegisterCustomerRequest request);
     Task UpdateAsync(int id, UpdateCustomerRequest request);
