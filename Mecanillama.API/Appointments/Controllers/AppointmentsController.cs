@@ -71,7 +71,7 @@ public class AppointmentsController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(AppointmentResource), 200)]
     [ProducesResponseType(typeof(BadRequestResult), 404)]
-    public async Task<IActionResult> PutAsync(long id, [FromBody] SaveAppointmentResource resource)
+    public async Task<IActionResult> PutAsync(int id, [FromBody] SaveAppointmentResource resource)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState.GetErrorMessages());
@@ -95,7 +95,7 @@ public class AppointmentsController : ControllerBase
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(AppointmentResource), 200)]
     [ProducesResponseType(typeof(BadRequestResult), 404)]
-    public async Task<IActionResult> DeleteAsync(long id)
+    public async Task<IActionResult> DeleteAsync(int id)
     {
         var result = await _appointmentService.DeleteAsync(id);
 

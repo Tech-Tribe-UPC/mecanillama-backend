@@ -19,7 +19,7 @@ public class CustomerRepository : BaseRepository, ICustomerRepository
         await _context.Customers.AddAsync(customer);
     }
 
-    public async Task<Customer> FindByIdAsync(long id)
+    public async Task<Customer> FindByIdAsync(int id)
     {
         return await _context.Customers.FindAsync(id);
     }

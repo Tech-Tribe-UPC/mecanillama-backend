@@ -15,6 +15,7 @@ public class ResourceToModelProfile : Profile
 {
     public ResourceToModelProfile()
     {
+        CreateMap<RegisterCustomerRequest, Customer>();
         CreateMap<SaveCustomerResource, Customer>();
         CreateMap<SaveMechanicResource, Mechanic>();
         CreateMap<SaveAppointmentResource, Appointment>();

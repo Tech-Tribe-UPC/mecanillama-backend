@@ -11,9 +11,9 @@ public class SaveAppointmentResource
     public string Time { get; set; }
 
     [Required]
-    public long CustomerId { get; set; }
+    public int CustomerId { get; set; }
 
     [Required]
-    public long MechanicId { get; set; }
+    public int MechanicId { get; set; }
     
 }

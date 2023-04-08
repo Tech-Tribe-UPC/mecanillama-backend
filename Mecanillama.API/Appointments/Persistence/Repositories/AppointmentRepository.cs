@@ -21,7 +21,7 @@ public class AppointmentRepository: BaseRepository, IAppointmentRepository
         await _context.Appointments.AddAsync(appointment);
     }
 
-    public async Task<Appointment> FindByIdAsync(long id)
+    public async Task<Appointment> FindByIdAsync(int id)
     {
         return await _context.Appointments.FindAsync(id);
     }

@@ -10,7 +10,7 @@ public class Review
     public string Comment { get; set; }
     public int Score { get; set; }
     
-    public long MechanicId { get; set; }
+    public int MechanicId { get; set; }
     public Mechanic Mechanic { get; set; } 
     
 }
