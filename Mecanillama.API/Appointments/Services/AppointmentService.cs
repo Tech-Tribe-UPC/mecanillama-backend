@@ -36,7 +36,7 @@ public class AppointmentService : IAppointmentService
         }
     }
 
-    public async Task<AppointmentResponse> UpdateAsync(long id, Appointment appointment)
+    public async Task<AppointmentResponse> UpdateAsync(int id, Appointment appointment)
     {
         var existingAppointment = await _appointmentRepository.FindByIdAsync(id);
         if (existingAppointment == null)
@@ -59,7 +59,7 @@ public class AppointmentService : IAppointmentService
         }
     }
 
-    public async Task<AppointmentResponse> DeleteAsync(long id)
+    public async Task<AppointmentResponse> DeleteAsync(int id)
     {
         var existingAppointment = await _appointmentRepository.FindByIdAsync(id);
         if (existingAppointment == null)

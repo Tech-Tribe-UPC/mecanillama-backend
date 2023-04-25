@@ -23,16 +23,24 @@ public class MechanicRepository : BaseRepository, IMechanicRepository
         await _context.Mechanics.AddAsync(mechanic);
     }
 
-    public async Task<Mechanic> FindByIdAsync(long id)
+    public async Task<Mechanic> FindByIdAsync(int id)
     {
         return await _context.Mechanics.FindAsync(id);
     }
-    
-    public async Task<Mechanic> FindByUserIdAsync(long userId)
+
+    public Mechanic FindById(int id)
     {
-        return await _context.Mechanics
-            .Where(p => p.UserId == userId)
-            .FirstOrDefaultAsync();
+        return _context.Mechanics.Find(id);
+    }
+
+    public async Task<Mechanic> FindByEmailAsync(string email)
+    {
+        return await _context.Mechanics.SingleOrDefaultAsync(C => C.Email == email);
+    }
+
+    public bool ExistsByEmail(string email)
+    {
+        return _context.Mechanics.Any(c => c.Email == email);
     }
 
     public void Update(Mechanic mechanic)

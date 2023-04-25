@@ -6,8 +6,10 @@ public interface IMechanicRepository
 {
     Task<IEnumerable<Mechanic>> ListAsync();
     Task AddAsync(Mechanic mechanic);
-    Task<Mechanic> FindByIdAsync(long id);
-    Task<Mechanic> FindByUserIdAsync(long userId);
+    Task<Mechanic> FindByIdAsync(int id);
+    Mechanic FindById(int id);
+    Task<Mechanic> FindByEmailAsync(string email);
+    public bool ExistsByEmail(string email);
     void Update(Mechanic mechanic);
     void Remove(Mechanic mechanic);
 }

@@ -6,11 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Mecanillama.API.Customers.Persistence.Repositories;
 
-public class CustomerRepository :BaseRepository, ICustomerRepository
+public class CustomerRepository : BaseRepository, ICustomerRepository
 {
-    public CustomerRepository(AppDbContext context) : base(context){}
-
-
+    public CustomerRepository(AppDbContext context) : base(context) { }
     public async Task<IEnumerable<Customer>> ListAsync()
     {
         return await _context.Customers.ToListAsync();
@@ -21,16 +19,24 @@ public class CustomerRepository :BaseRepository, ICustomerRepository
         await _context.Customers.AddAsync(customer);
     }
 
-    public async Task<Customer> FindByIdAsync(long id)
+    public async Task<Customer> FindByIdAsync(int id)
     {
         return await _context.Customers.FindAsync(id);
     }
-    
-    public async Task<Customer> FindByUserIdAsync(long userId)
+
+    public Customer FindById(int id)
     {
-        return await _context.Customers
-            .Where(p => p.UserId == userId)
-            .FirstOrDefaultAsync();
+        return _context.Customers.Find(id);
+    }
+
+    public async Task<Customer> FindByEmailAsync(string email)
+    {
+        return await _context.Customers.SingleOrDefaultAsync(C => C.Email == email);
+    }
+
+    public bool ExistsByEmail(string email)
+    {
+        return _context.Customers.Any(c => c.Email == email);
     }
 
     public void Update(Customer customer)

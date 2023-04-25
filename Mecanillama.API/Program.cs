@@ -19,10 +19,7 @@ using Mecanillama.API.Security.Authorization.Handlers.Implementations;
 using Mecanillama.API.Security.Authorization.Handlers.Interfaces;
 using Mecanillama.API.Security.Authorization.MIddleware;
 using Mecanillama.API.Security.Authorization.Settings;
-using Mecanillama.API.Security.Domain.Repositories;
 using Mecanillama.API.Security.Domain.Services;
-using Mecanillama.API.Security.Persistence.Repositories;
-using Mecanillama.API.Security.Services;
 using Mecanillama.API.Shared.Domain.Repositories;
 using Mecanillama.API.Shared.Persistence.Contexts;
 using Mecanillama.API.Shared.Persistence.Repositories;
@@ -111,8 +108,6 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Security Injection Configuration
 builder.Services.AddScoped<IJwtHandler, JwtHandler>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
 
 // AutoMapper Configuration
 

@@ -6,7 +6,7 @@ public interface IAppointmentRepository
 {
     Task<IEnumerable<Appointment>> ListAsync();
     Task AddAsync(Appointment appointment);
-    Task<Appointment> FindByIdAsync(long id);
+    Task<Appointment> FindByIdAsync(int id);
     void Update(Appointment appointment);
     void Remove(Appointment appointment);
 }
