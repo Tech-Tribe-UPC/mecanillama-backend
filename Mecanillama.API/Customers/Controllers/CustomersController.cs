@@ -5,142 +5,82 @@ using Mecanillama.API.Customers.Domain.Services;
 using Mecanillama.API.Customers.Resources;
 using Mecanillama.API.Shared.Extensions;
 using Swashbuckle.AspNetCore.Annotations;
+using Mecanillama.API.Security.Authorization.Attributes;
+using Mecanillama.API.Security.Domain.Services.Communication;
 
 namespace Mecanillama.API.Customers.Controllers;
 
-[Route("/api/v1/[controller]")] 
+[Produces("application/json")]
+[ApiController]
+[Route("/api/v1/[controller]")]
 [SwaggerTag("Create, read, update and delete Customers")]
-public class CustomersController : ControllerBase {
+public class CustomersController : ControllerBase
+{
     private readonly ICustomerService _customerService;
     private readonly IMapper _mapper;
 
-    public CustomersController(ICustomerService customerService, IMapper mapper) {
+    public CustomersController(ICustomerService customerService, IMapper mapper)
+    {
         _customerService = customerService;
         _mapper = mapper;
     }
-    
+
     [SwaggerOperation(
         Summary = "Get all Customers",
-        Description = "Get Method for all Customers",
-        OperationId = "GetAllCustomers")]
-    [SwaggerResponse(200, "All Customers returned", typeof(IEnumerable<CustomerResource>))]
+        Description = "Get All The Customers From The Database.",
+        Tags = new[] { "Customers" })]
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<CustomerResource>), 200)]
-    public async Task<IEnumerable<CustomerResource>> GetAllSync() {
+    public async Task<IActionResult> GetAll()
+    {
         var customers = await _customerService.ListAsync();
         var resources = _mapper.Map<IEnumerable<Customer>, IEnumerable<CustomerResource>>(customers);
-        
-        return resources;
+
+        return Ok(resources);
     }
-    
-    [SwaggerOperation(
-        Summary = "Get Customer by Id",
-        Description = "Get Customer by Id",
-        OperationId = "GetCustomerById")]
-    [SwaggerResponse(200, "Customer returned", typeof(CustomerResource))]
 
     [HttpGet("{id}")]
-    [ProducesResponseType(typeof(CustomerResource), 200)]
-    [ProducesResponseType(typeof(BadRequestResult), 404)]
-    public async Task<IActionResult> GetByIdAsync(long id)
+    [SwaggerOperation(
+        Summary = "Get Customer By Id",
+        Description = "Get A Customer From The Database By Id.",
+        Tags = new[] { "Customers" })]
+    public async Task<IActionResult> GetById(int id)
     {
-        var result = await _customerService.GetByIdAsync(id);
-
-        if (!result.Success)
-            return BadRequest(result.Message);
-
-        var customerResult = _mapper.Map<Customer, CustomerResource>(result.Resource);
-
-        return Ok(customerResult);
+        var customer = await _customerService.GetByIdAsync(id);
+        var resources = _mapper.Map<Customer, CustomerResource>(customer);
+        return Ok(resources);
     }
 
+    [AllowAnonymous]
+    [HttpPost("auth/sign-up")]
     [SwaggerOperation(
-        Summary = "Get Customer by User Id",
-        Description = "Get Customer by User Id",
-        OperationId = "GetCustomerByUserId")]
-    [SwaggerResponse(200, "Customer returned", typeof(CustomerResource))]
-
-    [HttpGet("uid/{userId}")]
-    [ProducesResponseType(typeof(CustomerResource), 200)]
-    [ProducesResponseType(typeof(BadRequestResult), 404)]
-    public async Task<IActionResult> GetByUserIdAsync(long userId)
+        Summary = "Register A Customer",
+        Description = "Add A Customer To The Database.",
+        Tags = new[] { "Customers" })]
+    public async Task<IActionResult> Register(RegisterCustomerRequest request)
     {
-        var result = await _customerService.GetByUserIdAsync(userId);
-
-        if (!result.Success)
-            return BadRequest(result.Message);
-
-        var customerResult = _mapper.Map<Customer, CustomerResource>(result.Resource);
-
-        return Ok(customerResult);
+        await _customerService.RegisterAsync(request);
+        return Ok(new { message = "Registration successful" });
     }
-    
-    [SwaggerOperation(
-        Summary = "Save Customers",
-        Description = "Save Customers",
-        OperationId = "SaveCustomer")]
-    [SwaggerResponse(201, "Customer saved", typeof(CustomerResource))]
-    
-    [HttpPost]
-    [ProducesResponseType(typeof(CustomerResource), 201)]
-    [ProducesResponseType(typeof(List<string>), 400)]
-    [ProducesResponseType(500)]
-    public async Task<IActionResult> PostAsync([FromBody] SaveCustomerResource resource)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState.GetErrorMessages());
 
-        var customer = _mapper.Map<SaveCustomerResource, Customer>(resource);
-
-        var result = await _customerService.SaveAsync(customer);
-
-        if (!result.Success)
-            return BadRequest(result.Message);
-
-        var customerResource = _mapper.Map<Customer, CustomerResource>(result.Resource);
-
-        return Ok(customerResource);
-    }
-    
-    [SwaggerOperation(
-        Summary = "Update Customer",
-        Description = "Update Customer",
-        OperationId = "UpdateCustomer")]
-    [SwaggerResponse(200, "Customer updated", typeof(CustomerResource))]
     [HttpPut("{id}")]
-    [ProducesResponseType(typeof(CustomerResource), 200)]
-    public async Task<IActionResult> PutAsync(int id, [FromBody] SaveCustomerResource resource)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState.GetErrorMessages());
-        
-        var customer = _mapper.Map<SaveCustomerResource, Customer>(resource);
-
-        var result = await _customerService.UpdateAsync(id, customer);
-        
-        if (!result.Success)
-            return BadRequest(result.Message);
-
-        var customerResource = _mapper.Map<Customer, CustomerResource>(result.Resource);
-
-        return Ok(customerResource);
-    }
-    
     [SwaggerOperation(
-        Summary = "Delete Customer",
-        Description = "Delete Customer",
-        OperationId = "DeleteCustomer")]
-    [SwaggerResponse(200, "Customer deleted", typeof(CustomerResource))]
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(long id)
+    Summary = "Edit A Customer",
+    Description = "Edit The Information Of A Customer Identified By Id.",
+    Tags = new[] { "Customers" })]
+    public async Task<IActionResult> Update(int id, UpdateCustomerRequest request)
     {
-        var result = await _customerService.DeleteAsync(id);
-        
-        if (!result.Success)
-            return BadRequest(result.Message);
+        await _customerService.UpdateAsync(id, request);
+        return Ok(new { message = "Customer updated successfully" });
+    }
 
-        var customerResource = _mapper.Map<Customer, CustomerResource>(result.Resource);
-
-        return Ok(customerResource);
+    [HttpDelete("{id}")]
+    [SwaggerOperation(
+    Summary = "Delete A Customer",
+    Description = "Delete The Information Of A Customer Identified By Id.",
+    Tags = new[] { "Customers" })]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _customerService.DeleteAsync(id);
+        return Ok(new { message = "Customer deleted successfully" });
     }
 }

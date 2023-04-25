@@ -7,6 +7,6 @@ public interface IAppointmentService
 {
     Task<IEnumerable<Appointment>> ListAsync();
     Task<AppointmentResponse> SaveAsync(Appointment appointment);
-    Task<AppointmentResponse> UpdateAsync(long id, Appointment appointment);
-    Task<AppointmentResponse> DeleteAsync(long id);
+    Task<AppointmentResponse> UpdateAsync(int id, Appointment appointment);
+    Task<AppointmentResponse> DeleteAsync(int id);
 }

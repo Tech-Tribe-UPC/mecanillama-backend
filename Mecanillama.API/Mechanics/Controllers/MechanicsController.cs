@@ -2,12 +2,16 @@
 using Mecanillama.API.Mechanics.Domain.Models;
 using Mecanillama.API.Mechanics.Domain.Services;
 using Mecanillama.API.Mechanics.Resources;
+using Mecanillama.API.Security.Authorization.Attributes;
+using Mecanillama.API.Security.Domain.Services.Communication;
 using Mecanillama.API.Shared.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Mecanillama.API.Mechanics.Controllers;
 
+[Produces("application/json")]
+[ApiController]
 [Route("/api/v1/[controller]")]
 [SwaggerTag("Create, read, update and delete Mechanics")]
 public class MechanicsController : ControllerBase
@@ -15,133 +19,69 @@ public class MechanicsController : ControllerBase
     private readonly IMechanicService _mechanicService;
     private readonly IMapper _mapper;
 
-    public MechanicsController(IMechanicService mechanicService, IMapper mapper) {
+    public MechanicsController(IMechanicService mechanicService, IMapper mapper)
+    {
         _mechanicService = mechanicService;
         _mapper = mapper;
     }
-    
+
     [SwaggerOperation(
         Summary = "Get all Mechanics",
         Description = "Get Method for all Mechanics",
         OperationId = "GetAllMechanics")]
-    [SwaggerResponse(200, "All Mechanics returned", typeof(IEnumerable<MechanicResource>))]
+
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<MechanicResource>), 200)]
-    public async Task<IEnumerable<MechanicResource>> GetAllSync() {
+    public async Task<IEnumerable<MechanicResource>> GetAllAsync()
+    {
         var mechanics = await _mechanicService.ListAsync();
         var resources = _mapper.Map<IEnumerable<Mechanic>, IEnumerable<MechanicResource>>(mechanics);
-        
+
         return resources;
     }
-    
-    [SwaggerOperation(
-        Summary = "Get Mechanic by Id",
-        Description = "Get Mechanic by Id",
-        OperationId = "GetMechanicById")]
-    [SwaggerResponse(200, "Mechanic returned", typeof(MechanicResource))]
 
     [HttpGet("{id}")]
-    [ProducesResponseType(typeof(MechanicResource), 200)]
-    [ProducesResponseType(typeof(BadRequestResult), 404)]
-    public async Task<IActionResult> GetByIdAsync(long id)
+    [SwaggerOperation(
+            Summary = "Get a mechanic by Id",
+            Description = "Get a mechanic Data already stored",
+            Tags = new[] { "Mechanics" })]
+
+    public async Task<IActionResult> GetByIdAsync(int id)
     {
-        var result = await _mechanicService.GetByIdAsync(id);
-
-        if (!result.Success)
-            return BadRequest(result.Message);
-
-        var mechanicResult = _mapper.Map<Mechanic, MechanicResource>(result.Resource);
-
-        return Ok(mechanicResult);
+        var mechanic = await _mechanicService.GetByIdAsync(id);
+        var resources = _mapper.Map<Mechanic, MechanicResource>(mechanic);
+        return Ok(resources);
     }
 
+    [AllowAnonymous]
+    [HttpPost("auth/sign-up")]
     [SwaggerOperation(
-        Summary = "Get Mechanic by User Id",
-        Description = "Get Mechanic by User Id",
-        OperationId = "GetMechanicByUserId")]
-    [SwaggerResponse(200, "Mechanic returned", typeof(MechanicResource))]
-
-    [HttpGet("uid/{userId}")]
-    [ProducesResponseType(typeof(MechanicResource), 200)]
-    [ProducesResponseType(typeof(BadRequestResult), 404)]
-    public async Task<IActionResult> GetByUserIdAsync(long userId)
+    Summary = "Register a new mechanic",
+    Description = "register a new mechanic in the database",
+    Tags = new[] { "Mechanics" })]
+    public async Task<IActionResult> Register(SaveMechanicResource request)
     {
-        var result = await _mechanicService.GetByUserIdAsync(userId);
-
-        if (!result.Success)
-            return BadRequest(result.Message);
-
-        var mechanicResult = _mapper.Map<Mechanic, MechanicResource>(result.Resource);
-
-        return Ok(mechanicResult);
+        await _mechanicService.RegisterAsync(request);
+        return Ok(new { message = "Registration successful" });
     }
-    
-    [SwaggerOperation(
-        Summary = "Save Mechanic",
-        Description = "Save Mechanic",
-        OperationId = "SaveMechanic")]
-    [SwaggerResponse(201, "Mechanic saved", typeof(MechanicResource))]
-    
-    [HttpPost]
-    [ProducesResponseType(typeof(MechanicResource), 201)]
-    [ProducesResponseType(typeof(List<string>), 400)]
-    [ProducesResponseType(500)]
-    public async Task<IActionResult> PostAsync([FromBody] SaveMechanicResource resource)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState.GetErrorMessages());
 
-        var mechanic = _mapper.Map<SaveMechanicResource, Mechanic>(resource);
-
-        var result = await _mechanicService.SaveAsync(mechanic);
-
-        if (!result.Success)
-            return BadRequest(result.Message);
-
-        var mechanicResource = _mapper.Map<Mechanic, MechanicResource>(result.Resource);
-
-        return Ok(mechanicResource);
-    }
-    
-    [SwaggerOperation(
-        Summary = "Update Mechanic",
-        Description = "Update Mechanic",
-        OperationId = "UpdateMechanic")]
-    [SwaggerResponse(200, "Mechanic updated", typeof(MechanicResource))]
-    
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutAsync(int id, [FromBody] SaveMechanicResource resource)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState.GetErrorMessages());
-        
-        var mechanic = _mapper.Map<SaveMechanicResource, Mechanic>(resource);
-
-        var result = await _mechanicService.UpdateAsync(id, mechanic);
-        
-        if (!result.Success)
-            return BadRequest(result.Message);
-
-        var mechanicResource = _mapper.Map<Mechanic, MechanicResource>(result.Resource);
-
-        return Ok(mechanicResource);
-    }
-    
     [SwaggerOperation(
-        Summary = "Delete Mechanic",
-        Description = "Delete Mechanic",
-        OperationId = "DeleteMechanic")]
-    [SwaggerResponse(200, "Mechanic deleted", typeof(MechanicResource))]
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteAsync(int id)
+    Summary = "Edit a mechanic",
+    Description = "Updates the data of a stored mechanic given its id",
+    Tags = new[] { "Mechanics" })]
+    public async Task<IActionResult> Update(int id, UpdateMechanicRequest request)
     {
-        var result = await _mechanicService.DeleteAsync(id);
-        
-        if (!result.Success)
-            return BadRequest(result.Message);
-
-        var mechanicResource = _mapper.Map<Mechanic, MechanicResource>(result.Resource);
-
-        return Ok(mechanicResource);
+        await _mechanicService.UpdateAsync(id, request);
+        return Ok(new { message = "Mechanic updated successfully" });
+    }
+    [HttpDelete("{id}")]
+    [SwaggerOperation(
+        Summary = "Delete a mechanic",
+        Description = "Delete the data of a stored mechanic given its id",
+        Tags = new[] { "Mechanics" })]
+    public async Task<IActionResult> Delete(int id)
+    {
+        await _mechanicService.DeleteAsync(id);
+        return Ok(new { message = "Mechanic deleted successfully" });
     }
 }
