@@ -21,6 +21,7 @@ using Mecanillama.API.Security.Authorization.MIddleware;
 using Mecanillama.API.Security.Authorization.Settings;
 using Mecanillama.API.Security.Domain.Services;
 using Mecanillama.API.Shared.Domain.Repositories;
+using Mecanillama.API.Shared.Domain.Services;
 using Mecanillama.API.Shared.Persistence.Contexts;
 using Mecanillama.API.Shared.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -104,6 +105,7 @@ builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Security Injection Configuration
