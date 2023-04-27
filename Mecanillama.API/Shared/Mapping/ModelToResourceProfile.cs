@@ -16,9 +16,14 @@ public class ModelToResourceProfile : Profile
     public ModelToResourceProfile()
     {
         CreateMap<Customer, CustomerResource>();
+        CreateMap<Customer, AuthenticateResponse>();
         CreateMap<Mechanic, MechanicResource>();
         CreateMap<Appointment, AppointmentResource>();
+        CreateMap<Mechanic, AuthenticateResponse>();
         CreateMap<Review, ReviewResource>();
+
+        CreateMap<AuthenticateResponse, AuthenticateMechanicResponse>();
+        CreateMap<AuthenticateResponse, AuthenticateCustomerResponse>();
     }
 
 }
