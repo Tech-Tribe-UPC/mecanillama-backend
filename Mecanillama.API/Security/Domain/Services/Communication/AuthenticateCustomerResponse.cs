@@ -1,6 +1,6 @@
-﻿namespace Mecanillama.API.Security.Domain.Services.Communication;
+namespace Mecanillama.API.Security.Domain.Services.Communication;
 
-public class AuthenticateResponse
+public class AuthenticateCustomerResponse
 {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -8,7 +8,4 @@ public class AuthenticateResponse
     public string Address { get; set; }
     public string CarMake { get; set; }
     public string Token { get; set; }
-    public string Description { get; set; }
-    public long Phone { get; set; }
-    
 }
