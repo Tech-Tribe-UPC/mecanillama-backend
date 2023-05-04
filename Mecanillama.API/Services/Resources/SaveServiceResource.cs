@@ -17,5 +17,5 @@ namespace Mecanillama.API.Services.Resources;
         public string Photos { get; set; }
 
         [Required]
-        public int AgencyId { get; set; }
+        public int MechanicId { get; set; }
     }
