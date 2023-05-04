@@ -6,9 +6,9 @@ namespace Mecanillama.API.Services.Domain.Services;
 public interface IServiceService
 {
     Task<IEnumerable<Service>> ListAsync();
-    Task<Service> GetByIdAsync(int id);
-    Task RegisterAsync(SaveServiceResource request);
-    Task UpdateAsync(int id, UpdateServiceRequest request);
-    Task DeleteAsync(int id);
-    Task<ServiceResponse> FindById(int id);
+    Task<IEnumerable<Service>> ListByMechanicIdAsync(int mechanicId);
+    Task<ServiceResponse> GetByIdAsync(int id);
+    Task<ServiceResponse> SaveAsync(Service service);
+    Task<ServiceResponse> UpdateAsync(int id, Service service);
+    Task<ServiceResponse> DeleteAsync(int id);
 }
