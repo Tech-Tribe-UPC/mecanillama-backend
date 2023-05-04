@@ -54,7 +54,11 @@ public class AppDbContext : DbContext
         builder.Entity<Mechanic>().HasMany(p => p.Reviews)
             .WithOne(p => p.Mechanic)
             .HasForeignKey(p => p.MechanicId);
-        
+
+        builder.Entity<Mechanic>()
+                .HasMany(p => p.Services)
+                .WithOne(p => p.Mechanic)
+                .HasForeignKey(p => p.MechanicId);        
         //Appointments
         builder.Entity<Appointment>().ToTable("Appointments");
         builder.Entity<Appointment>().HasKey(p => p.Id);
