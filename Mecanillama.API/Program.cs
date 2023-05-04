@@ -20,6 +20,9 @@ using Mecanillama.API.Security.Authorization.Handlers.Interfaces;
 using Mecanillama.API.Security.Authorization.MIddleware;
 using Mecanillama.API.Security.Authorization.Settings;
 using Mecanillama.API.Security.Domain.Services;
+using Mecanillama.API.Services.Domain.Repositories;
+using Mecanillama.API.Services.Domain.Services;
+using Mecanillama.API.Services.Resources;
 using Mecanillama.API.Shared.Domain.Repositories;
 using Mecanillama.API.Shared.Domain.Services;
 using Mecanillama.API.Shared.Persistence.Contexts;
@@ -105,6 +108,8 @@ builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IServiceRepository, ServiceRepository>();
+builder.Services.AddScoped<IServiceService, ServiceService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
