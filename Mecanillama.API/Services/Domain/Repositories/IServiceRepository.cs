@@ -3,7 +3,7 @@ using Mecanillama.API.Services.Domain.Models;
 
 namespace Mecanillama.API.Services.Domain.Repositories;
 
-public interface IServiceRespository
+public interface IServiceRepository
 {
     Task<IEnumerable<Service>> ListAsync();
     Task<IEnumerable<Service>> ListByMechanicId(int mechanicId);

@@ -2,6 +2,7 @@
 using Mecanillama.API.Customers.Domain.Model;
 using Mecanillama.API.Mechanics.Domain.Models;
 using Mecanillama.API.Reviews.Domain.Models;
+using Mecanillama.API.Services.Domain.Models;
 using Mecanillama.API.Shared.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +16,7 @@ public class AppDbContext : DbContext
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<Mechanic> Mechanics { get; set; }
     public DbSet<Review> Reviews { get; set; }
+    public DbSet<Service> Services {get; set;}
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -71,6 +73,17 @@ public class AppDbContext : DbContext
         builder.Entity<Review>().Property(p => p.Comment).IsRequired().HasMaxLength(40);
         builder.Entity<Review>().Property(p => p.Score).IsRequired();
         
+        //Relationships
+
+        //Services
+        builder.Entity<Service>().ToTable("Services");
+        builder.Entity<Service>().HasKey(p => p.Id);
+        builder.Entity<Service>().Property(p => p.Id).IsRequired().ValueGeneratedOnAdd();
+        builder.Entity<Service>().Property(p => p.Name).IsRequired().HasMaxLength(50);
+        builder.Entity<Service>().Property(p => p.Description).IsRequired();
+        builder.Entity<Service>().Property(p => p.Price).IsRequired();
+        builder.Entity<Service>().Property(p => p.Photos).IsRequired();
+
         //Relationships
         
         //Snake Case Conventions
