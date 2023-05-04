@@ -23,6 +23,6 @@ public class SaveMechanicResource
     public string Description { get; set; }
 
     [Required]
-    public long Phone { get; set; }
+    public string Phone { get; set; }
 
 }

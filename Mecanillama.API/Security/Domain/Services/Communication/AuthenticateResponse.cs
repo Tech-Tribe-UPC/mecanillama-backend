@@ -9,6 +9,6 @@ public class AuthenticateResponse
     public string CarMake { get; set; }
     public string Token { get; set; }
     public string Description { get; set; }
-    public long Phone { get; set; }
+    public string Phone { get; set; }
     
 }
