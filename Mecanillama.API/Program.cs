@@ -86,8 +86,8 @@ builder.Services.AddSwaggerGen(options =>
 
 // Add Database Connection
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-//var connectionString = builder.Configuration.GetConnectionString("AzureDbConnection");
+//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = builder.Configuration.GetConnectionString("AzureDbConnection");
 
 // Database Connection with Standard Level for Information and Errors
 
@@ -135,7 +135,7 @@ using (var context = scope.ServiceProvider.GetService<AppDbContext>())
 
 // Configure the HTTP request pipeline.
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI(options =>
