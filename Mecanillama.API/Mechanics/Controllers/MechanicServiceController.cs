@@ -10,7 +10,7 @@ namespace Mecanillama.API.Mechanics.Controllers;
 [Produces("application/json")]
 [ApiController]
 [Route("/api/v1/mechanics/{mechanicId}/services")]
-[SwaggerTag("Create, read, update and delete Mechanics")]
+[SwaggerTag("Create, read, update and delete Services based on Mechanic data")]
 
 public class MechanicServiceController: ControllerBase
 {
